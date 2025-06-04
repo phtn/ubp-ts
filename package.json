@@ -1,0 +1,30 @@
+{
+  "name": "ubp-ts",
+  "version": "0.1.1",
+  "author": {
+    "email": "phtn458@gmail.com",
+    "name": "xpriori",
+    "url": "https://github.com/phtn"
+  },
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch ./src/index.ts ",
+    "build": "bunchee src/index.ts --out-dir dist",
+    "postbuild": "cp -f src/index.d.ts dist/index.d.ts",
+    "expand:yaml": "bun run src/utils/expand-yaml.ts",
+    "convert:s2o": "bunx swagger2openapi openapi.noanchors.yml -o openapi3.yml",
+    "gen:oats": "bunx openapi-typescript openapi3.yml --output src/types/openapi.generated.ts",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "bunchee": "^6.5.2",
+    "openapi-typescript": "^7.8.0",
+    "swagger-cli": "^4.0.4",
+    "swagger2openapi": "^7.0.8"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
