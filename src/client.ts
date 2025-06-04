@@ -42,8 +42,6 @@ import {
   getPesonetBanks,
   type TransferRequestv3,
   type TransferResponsev3,
-  type InstapayRequest3,
-  type InstapayResponse3,
   type OutwardRequest,
   type OutwardResponse,
   type OnlineInstapayRequest,
@@ -613,7 +611,7 @@ export class UBPClient {
       clientSecret: this.clientSecret,
       fetchImpl: this.fetchImpl,
       baseUrl: this.baseUrl,
-    });
+    }) as RetrieveResponsev3;
   }
 
   async getPesonetBanks(
@@ -628,7 +626,7 @@ export class UBPClient {
       clientSecret: this.clientSecret,
       fetchImpl: this.fetchImpl,
       baseUrl: this.baseUrl,
-    });
+    }) as RetrieveResponsev3;
   }
 
   async replenishSandboxAccount(

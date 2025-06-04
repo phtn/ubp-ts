@@ -8,16 +8,16 @@ export async function makeMerchantPayment({
   partnerId,
   body,
   fetchImpl = fetch,
-  baseUrl = "https://api-uat.unionbankph.com/partners/sb"
+  baseUrl = "https://api-uat.unionbankph.com/partners/sb",
 }: {
   clientId: string;
   clientSecret: string;
   accessToken: string;
   partnerId: string;
-  body: any;
+  body: object;
   fetchImpl?: Fetch;
   baseUrl?: string;
-}): Promise<any> {
+}): Promise<unknown> {
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
   requireParam(accessToken, "accessToken");
@@ -26,7 +26,7 @@ export async function makeMerchantPayment({
   const res = await fetchImpl(`${baseUrl}/merchants/v5/payments/single`, {
     method: "POST",
     headers: {
-      "accept": "application/json",
+      accept: "application/json",
       "content-type": "application/json",
       "x-ibm-client-id": clientId,
       "x-ibm-client-secret": clientSecret,
@@ -35,7 +35,10 @@ export async function makeMerchantPayment({
     },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`Failed to make merchant payment: ${res.status} ${res.statusText}`);
+  if (!res.ok)
+    throw new Error(
+      `Failed to make merchant payment: ${res.status} ${res.statusText}`,
+    );
   return await res.json();
 }
 
@@ -46,7 +49,7 @@ export async function getMerchantPaymentStatus({
   partnerId,
   partnerRefId,
   fetchImpl = fetch,
-  baseUrl = "https://api-uat.unionbankph.com/partners/sb"
+  baseUrl = "https://api-uat.unionbankph.com/partners/sb",
 }: {
   clientId: string;
   clientSecret: string;
@@ -55,24 +58,30 @@ export async function getMerchantPaymentStatus({
   partnerRefId: string;
   fetchImpl?: Fetch;
   baseUrl?: string;
-}): Promise<any> {
+}): Promise<unknown> {
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
   requireParam(accessToken, "accessToken");
   requireParam(partnerId, "partnerId");
   requireParam(partnerRefId, "partnerRefId");
-  const res = await fetchImpl(`${baseUrl}/merchants/v5/payments/single/${partnerRefId}`, {
-    method: "GET",
-    headers: {
-      "accept": "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/merchants/v5/payments/single/${partnerRefId}`,
+    {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
     },
-  });
-  if (!res.ok) throw new Error(`Failed to get merchant payment status: ${res.status} ${res.statusText}`);
+  );
+  if (!res.ok)
+    throw new Error(
+      `Failed to get merchant payment status: ${res.status} ${res.statusText}`,
+    );
   return await res.json();
 }
 
@@ -83,7 +92,7 @@ export async function getMerchantPaymentOTP({
   partnerId,
   partnerRefId,
   fetchImpl = fetch,
-  baseUrl = "https://api-uat.unionbankph.com/partners/sb"
+  baseUrl = "https://api-uat.unionbankph.com/partners/sb",
 }: {
   clientId: string;
   clientSecret: string;
@@ -92,7 +101,7 @@ export async function getMerchantPaymentOTP({
   partnerRefId: string;
   fetchImpl?: Fetch;
   baseUrl?: string;
-}): Promise<any> {
+}): Promise<unknown> {
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
   requireParam(accessToken, "accessToken");
@@ -101,7 +110,7 @@ export async function getMerchantPaymentOTP({
   const res = await fetchImpl(`${baseUrl}/merchants/v5/payments/otp/single`, {
     method: "GET",
     headers: {
-      "accept": "application/json",
+      accept: "application/json",
       "content-type": "application/json",
       "x-ibm-client-id": clientId,
       "x-ibm-client-secret": clientSecret,
@@ -109,6 +118,9 @@ export async function getMerchantPaymentOTP({
       "x-partner-id": partnerId,
     },
   });
-  if (!res.ok) throw new Error(`Failed to get merchant payment OTP: ${res.status} ${res.statusText}`);
+  if (!res.ok)
+    throw new Error(
+      `Failed to get merchant payment OTP: ${res.status} ${res.statusText}`,
+    );
   return await res.json();
-} 
+}
