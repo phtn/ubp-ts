@@ -26,7 +26,8 @@
   "scripts": {
     "build": "tsc",
     "test": "bun test",
-    "prepublishOnly": "bun test && bun run build"
+    "prepublishOnly": "bun test && bun run build",
+    "lint:fix": "bun run lint.mjs"
   },
   "publishConfig": {
     "access": "public"

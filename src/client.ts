@@ -42,8 +42,6 @@ import {
   getPesonetBanks,
   type TransferRequestv3,
   type TransferResponsev3,
-  type PesonetRequest3,
-  type PesonetResponse3,
   type InstapayRequest3,
   type InstapayResponse3,
   type OutwardRequest,
@@ -52,6 +50,9 @@ import {
   type OnlineInstapayResponse,
   type EONWalletInstapayRequest,
   type EONWalletInstapayResponse,
+  type SingleRequestV3,
+  type SingleResponseV3,
+  type RetrieveResponsev3,
 } from "./sdk/transfers";
 import {
   payBillsAsPartner,
@@ -454,8 +455,8 @@ export class UBPClient {
     params: Omit<
       Parameters<typeof transferPesonetPartner>[0],
       "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
-    > & { body: PesonetRequest3 },
-  ): Promise<PesonetResponse3> {
+    > & { body: SingleRequestV3 },
+  ): Promise<SingleResponseV3> {
     return transferPesonetPartner({
       ...params,
       clientId: this.clientId,
@@ -470,7 +471,7 @@ export class UBPClient {
       Parameters<typeof getPesonetPartnerTransferStatus>[0],
       "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
     >,
-  ): Promise<PesonetResponse3> {
+  ): Promise<SingleResponseV3> {
     return getPesonetPartnerTransferStatus({
       ...params,
       clientId: this.clientId,
@@ -484,8 +485,8 @@ export class UBPClient {
     params: Omit<
       Parameters<typeof transferInstapayPartner>[0],
       "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
-    > & { body: InstapayRequest3 },
-  ): Promise<InstapayResponse3> {
+    > & { body: SingleRequestV3 },
+  ): Promise<SingleResponseV3> {
     return transferInstapayPartner({
       ...params,
       clientId: this.clientId,
@@ -500,7 +501,7 @@ export class UBPClient {
       Parameters<typeof getInstapayPartnerTransferStatus>[0],
       "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
     >,
-  ): Promise<InstapayResponse3> {
+  ): Promise<SingleResponseV3> {
     return getInstapayPartnerTransferStatus({
       ...params,
       clientId: this.clientId,
@@ -605,7 +606,7 @@ export class UBPClient {
       Parameters<typeof getInstapayBanks>[0],
       "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
     >,
-  ): Promise<InstapayResponse3> {
+  ): Promise<RetrieveResponsev3> {
     return getInstapayBanks({
       ...params,
       clientId: this.clientId,
@@ -620,7 +621,7 @@ export class UBPClient {
       Parameters<typeof getPesonetBanks>[0],
       "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
     >,
-  ): Promise<InstapayResponse3> {
+  ): Promise<RetrieveResponsev3> {
     return getPesonetBanks({
       ...params,
       clientId: this.clientId,

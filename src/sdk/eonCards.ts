@@ -1,13 +1,17 @@
 import type { Fetch } from "../types/fetch";
 import type { components } from "../types/openapi.generated";
 import { throwUBPError } from "../utils/errorHelpers";
-import { requireParam, requireType } from "../utils/validation";
+import { requireParam } from "../utils/validation";
 
 export type VirtualCardResponse = components["schemas"]["VirtualCardResponse"];
-export type ActivateVirtualCardResponse = components["schemas"]["ActivateVirtualCardResponse"];
-export type EONWalletUnlockCardsResponse = components["schemas"]["EONWalletUnlockCardsResponse"];
-export type ReplacementCardResponse = components["schemas"]["ReplacementCardResponse"];
-export type LinkingPhysicalResponse = components["schemas"]["LinkingPhysicalResponse"];
+export type ActivateVirtualCardResponse =
+  components["schemas"]["ActivateVirtualCardResponse"];
+export type EONWalletUnlockCardsResponse =
+  components["schemas"]["EONWalletUnlockCardsResponse"];
+export type ReplacementCardResponse =
+  components["schemas"]["ReplacementCardResponse"];
+export type LinkingPhysicalResponse =
+  components["schemas"]["LinkingPhysicalResponse"];
 
 // 1. Create Virtual Account with Linked Virtual Card
 export async function createVirtualAccountWithCard({
@@ -23,7 +27,7 @@ export async function createVirtualAccountWithCard({
   clientSecret: string;
   accessToken: string;
   partnerId: string;
-  body: any; // TODO: type from openapi.generated
+  body: components["schemas"]["VirtualCardRequest"];
   fetchImpl?: Fetch;
   baseUrl?: string;
 }): Promise<VirtualCardResponse> {
@@ -32,18 +36,21 @@ export async function createVirtualAccountWithCard({
   requireParam(accessToken, "accessToken");
   requireParam(partnerId, "partnerId");
   requireParam(body, "body");
-  const res = await fetchImpl(`${baseUrl}/partners/eon/wallet/v1/cards/accounts/virtual`, {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/partners/eon/wallet/v1/cards/accounts/virtual`,
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
   return (await res.json()) as VirtualCardResponse;
 }
@@ -64,7 +71,7 @@ export async function activateVirtualCard({
   accessToken: string;
   partnerId: string;
   cardToken: string;
-  body: any; // TODO: type from openapi.generated
+  body: components["schemas"]["ActivateVirtualCardRequest"];
   fetchImpl?: Fetch;
   baseUrl?: string;
 }): Promise<ActivateVirtualCardResponse> {
@@ -74,19 +81,22 @@ export async function activateVirtualCard({
   requireParam(partnerId, "partnerId");
   requireParam(cardToken, "cardToken");
   requireParam(body, "body");
-  const res = await fetchImpl(`${baseUrl}/partners/eon/wallet/v2/cards/activation`, {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
-      "card-token": cardToken,
+  const res = await fetchImpl(
+    `${baseUrl}/partners/eon/wallet/v2/cards/activation`,
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+        "card-token": cardToken,
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
   return (await res.json()) as ActivateVirtualCardResponse;
 }
@@ -107,7 +117,7 @@ export async function unlockCard({
   accessToken: string;
   partnerId: string;
   cardToken: string;
-  body: any; // TODO: type from openapi.generated
+  body: components["schemas"]["EONWalletUnlockCardsRequest"];
   fetchImpl?: Fetch;
   baseUrl?: string;
 }): Promise<EONWalletUnlockCardsResponse> {
@@ -117,19 +127,22 @@ export async function unlockCard({
   requireParam(partnerId, "partnerId");
   requireParam(cardToken, "cardToken");
   requireParam(body, "body");
-  const res = await fetchImpl(`${baseUrl}/partners/eon/wallet/v2/cards/unlock`, {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
-      "card-token": cardToken,
+  const res = await fetchImpl(
+    `${baseUrl}/partners/eon/wallet/v2/cards/unlock`,
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+        "card-token": cardToken,
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
   return (await res.json()) as EONWalletUnlockCardsResponse;
 }
@@ -150,23 +163,26 @@ export async function replaceLockedCard({
   accessToken: string;
   partnerId: string;
   cardToken: string;
-  body: any; // TODO: type from openapi.generated
+  body: components["schemas"]["ReplacementCardRequest"];
   fetchImpl?: Fetch;
   baseUrl?: string;
 }): Promise<ReplacementCardResponse> {
-  const res = await fetchImpl(`${baseUrl}/partners/eon/wallet/v1/cards/replacements`, {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
-      "card-token": cardToken,
+  const res = await fetchImpl(
+    `${baseUrl}/partners/eon/wallet/v1/cards/replacements`,
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+        "card-token": cardToken,
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
   return (await res.json()) as ReplacementCardResponse;
 }
@@ -185,22 +201,25 @@ export async function linkPhysicalCard({
   clientSecret: string;
   accessToken: string;
   partnerId: string;
-  body: any; // TODO: type from openapi.generated
+  body: components["schemas"]["LinkingPhysicalRequest"];
   fetchImpl?: Fetch;
   baseUrl?: string;
 }): Promise<LinkingPhysicalResponse> {
-  const res = await fetchImpl(`${baseUrl}/partners/eon/wallet/v1/cards/accounts/linking`, {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/partners/eon/wallet/v1/cards/accounts/linking`,
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
   return (await res.json()) as LinkingPhysicalResponse;
 }
@@ -223,17 +242,20 @@ export async function getCustomerCards({
   fetchImpl?: Fetch;
   baseUrl?: string;
 }): Promise<any> {
-  const res = await fetchImpl(`${baseUrl}/partners/eon/wallet/v1/customers/${customerId}/cards`, {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/partners/eon/wallet/v1/customers/${customerId}/cards`,
+    {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
     },
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
   return await res.json();
-} 
+}

@@ -1,18 +1,23 @@
 import type { Fetch } from "../types/fetch";
 import type { components } from "../types/openapi.generated";
 import { throwUBPError } from "../utils/errorHelpers";
-import { requireParam, requireType } from "../utils/validation";
+import { requireParam } from "../utils/validation";
 
 // Types
-export type AccountInformationResponse = components["schemas"]["AccountInformationResponse"];
-export type OnlineAccountInformation = components["schemas"]["OnlineAccountInformation"];
-export type OnlineAccountInformationResponse = components["schemas"]["OnlineAccountInformationResponse"];
-export type SandboxRequest = any; // TODO: type from openapi.generated
-export type SandboxResponse = any; // TODO: type from openapi.generated
-export type SandboxErrors = any; // TODO: type from openapi.generated
+export type AccountInformationResponse =
+  components["schemas"]["AccountInformationResponse"];
+export type OnlineAccountInformation =
+  components["schemas"]["OnlineAccountInformation"];
+export type OnlineAccountInformationResponse =
+  components["schemas"]["OnlineAccountInformationResponse"];
+export type SandboxRequest = components["schemas"]["SandboxRequest"];
+export type SandboxResponse = components["schemas"]["SandboxResponse"];
+export type SandboxErrors = components["schemas"]["SandboxErrors"];
 export type AccountBalances = components["schemas"]["AccountBalances"];
-export type AccountBalancesErrors = components["schemas"]["AccountBalancesErrors"];
-export type AccountHistoryResponse = components["schemas"]["AccountHistoryResponse"];
+export type AccountBalancesErrors =
+  components["schemas"]["AccountBalancesErrors"];
+export type AccountHistoryResponse =
+  components["schemas"]["AccountHistoryResponse"];
 
 // 1. Get Account Details
 export async function getAccountInfo({
@@ -132,15 +137,18 @@ export async function getAccountBalance({
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
   requireParam(accountNumber, "accountNumber");
-  const res = await fetchImpl(`${baseUrl}/accounts/v2/balances/${accountNumber}`, {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
+  const res = await fetchImpl(
+    `${baseUrl}/accounts/v2/balances/${accountNumber}`,
+    {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+      },
     },
-  });
+  );
   if (!res.ok) await throwUBPError(res);
   return (await res.json()) as AccountBalances;
 }
@@ -168,7 +176,8 @@ export async function getPartnerAccountTransactionHistory({
   requireParam(accessToken, "accessToken");
   requireParam(partnerId, "partnerId");
   const url = new URL(`${baseUrl}/portal/accounts/v1/transactions`);
-  if (query) Object.entries(query).forEach(([k, v]) => url.searchParams.append(k, v));
+  if (query)
+    Object.entries(query).forEach(([k, v]) => url.searchParams.append(k, v));
   const res = await fetchImpl(url.toString(), {
     method: "GET",
     headers: {
@@ -207,7 +216,8 @@ export async function getCustomerAccountTransactionHistory({
   requireParam(accessToken, "accessToken");
   requireParam(partnerId, "partnerId");
   const url = new URL(`${baseUrl}/portal/online/accounts/v1/transactions`);
-  if (query) Object.entries(query).forEach(([k, v]) => url.searchParams.append(k, v));
+  if (query)
+    Object.entries(query).forEach(([k, v]) => url.searchParams.append(k, v));
   const res = await fetchImpl(url.toString(), {
     method: "GET",
     headers: {
@@ -221,4 +231,4 @@ export async function getCustomerAccountTransactionHistory({
   });
   if (!res.ok) await throwUBPError(res);
   return (await res.json()) as AccountHistoryResponse;
-} 
+}
