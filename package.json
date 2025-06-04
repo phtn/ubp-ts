@@ -1,30 +1,41 @@
 {
   "name": "ubp-ts",
-  "version": "0.1.1",
-  "author": {
-    "email": "phtn458@gmail.com",
-    "name": "xpriori",
-    "url": "https://github.com/phtn"
+  "version": "1.0.0",
+  "description": "UnionBank PH TypeScript SDK - Pure functional, fully typed, and robustly tested.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phtn/ubp-ts.git"
   },
-  "module": "src/index.ts",
+  "author": "phtn <phtn458@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "unionbank",
+    "sdk",
+    "typescript",
+    "banking",
+    "api"
+  ],
   "type": "module",
   "scripts": {
-    "dev": "bun run --watch ./src/index.ts ",
-    "build": "bunchee src/index.ts --out-dir dist",
-    "postbuild": "cp -f src/index.d.ts dist/index.d.ts",
-    "expand:yaml": "bun run src/utils/expand-yaml.ts",
-    "convert:s2o": "bunx swagger2openapi openapi.noanchors.yml -o openapi3.yml",
-    "gen:oats": "bunx openapi-typescript openapi3.yml --output src/types/openapi.generated.ts",
-    "test": "bun test"
+    "build": "tsc",
+    "test": "bun test",
+    "prepublishOnly": "bun test && bun run build"
   },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "bunchee": "^6.5.2",
-    "openapi-typescript": "^7.8.0",
-    "swagger-cli": "^4.0.4",
-    "swagger2openapi": "^7.0.8"
+  "publishConfig": {
+    "access": "public"
   },
-  "peerDependencies": {
-    "typescript": "^5"
+  "dependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.28.0",
+    "@typescript-eslint/eslint-plugin": "^8.33.1",
+    "@typescript-eslint/parser": "^8.33.1",
+    "eslint-plugin-unused-imports": "^4.1.4"
   }
 }

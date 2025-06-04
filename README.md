@@ -1,5 +1,7 @@
 # UnionBank TypeScript SDK (Pure Functional)
 
+![CI](https://github.com/phtn/ubp-ts/actions/workflows/ci.yml/badge.svg)
+
 ![Test Status](https://img.shields.io/badge/tests-passing-brightgreen?style=flat-square)
 ![Coverage](https://img.shields.io/badge/coverage-bun--test-informational?style=flat-square)
 
@@ -75,6 +77,21 @@ import {
   getAccountBalance,
   getPartnerAccountTransactionHistory,
   getCustomerAccountTransactionHistory,
+  getBranches,
+  getForexRates,
+  payBillsAsCustomer,
+  getCustomerBillsPaymentStatus,
+  replenishSandboxAccount,
+  updateSandboxAccount,
+  getCreditCardStatementSummary,
+  getCreditCardStatements,
+  getCreditCardUnbilled,
+  getCreditCardBalances,
+  getCreditCardCards,
+  getCreditCardPromos,
+  makeMerchantPayment,
+  getMerchantPaymentStatus,
+  getMerchantPaymentOTP,
 } from "./src";
 
 // Partner authentication
@@ -99,11 +116,23 @@ const atms = await getATMs({
   clientSecret: "your-client-secret",
 });
 
+// Fetch Branches
+const branches = await getBranches({
+  clientId: "your-client-id",
+  clientSecret: "your-client-secret",
+});
+
 // Get Account Details
 const accountInfo = await getAccountInfo({
   clientId: "your-client-id",
   clientSecret: "your-client-secret",
   accessToken: "partner-or-customer-access-token",
+});
+
+// Fetch Forex Rates
+const forexRates = await getForexRates({
+  clientId: "your-client-id",
+  clientSecret: "your-client-secret",
 });
 
 // Get Customer Bank Account Details
@@ -392,6 +421,35 @@ const ccPromos = await getCreditCardPromos({
   clientSecret: "your-client-secret",
   partnerId: "your-partner-id",
 });
+
+// --- Merchant Payments ---
+
+// Make Merchant Payment
+const merchantPayment = await makeMerchantPayment({
+  clientId: "your-client-id",
+  clientSecret: "your-client-secret",
+  accessToken: "partner-access-token",
+  partnerId: "your-partner-id",
+  body: {/* ...PaymentRequestv5... */},
+});
+
+// Get Merchant Payment Status
+const merchantPaymentStatus = await getMerchantPaymentStatus({
+  clientId: "your-client-id",
+  clientSecret: "your-client-secret",
+  accessToken: "partner-access-token",
+  partnerId: "your-partner-id",
+  partnerRefId: "your-partner-ref-id",
+});
+
+// Get Merchant Payment OTP
+const merchantPaymentOTP = await getMerchantPaymentOTP({
+  clientId: "your-client-id",
+  clientSecret: "your-client-secret",
+  accessToken: "partner-access-token",
+  partnerId: "your-partner-id",
+  partnerRefId: "your-partner-ref-id",
+});
 ```
 
 ---
@@ -409,8 +467,14 @@ const ubp = new UBPClient({
 // Fetch ATMs
 const atms = await ubp.getATMs();
 
+// Fetch Branches
+const branches = await ubp.getBranches();
+
 // Get Account Details
 const accountInfo = await ubp.getAccountInfo({ accessToken: "partner-or-customer-access-token" });
+
+// Fetch Forex Rates
+const forexRates = await ubp.getForexRates();
 
 // Get Customer Bank Account Details
 const customerAccountInfo = await ubp.getCustomerAccountInfo({
@@ -633,6 +697,29 @@ const ccCards = await ubp.getCreditCardCards({
 // Get Credit Card Promos
 const ccPromos = await ubp.getCreditCardPromos({
   partnerId: "your-partner-id",
+});
+
+// --- Merchant Payments ---
+
+// Make Merchant Payment
+const merchantPayment = await ubp.makeMerchantPayment({
+  accessToken: "partner-access-token",
+  partnerId: "your-partner-id",
+  body: {/* ...PaymentRequestv5... */},
+});
+
+// Get Merchant Payment Status
+const merchantPaymentStatus = await ubp.getMerchantPaymentStatus({
+  accessToken: "partner-access-token",
+  partnerId: "your-partner-id",
+  partnerRefId: "your-partner-ref-id",
+});
+
+// Get Merchant Payment OTP
+const merchantPaymentOTP = await ubp.getMerchantPaymentOTP({
+  accessToken: "partner-access-token",
+  partnerId: "your-partner-id",
+  partnerRefId: "your-partner-ref-id",
 });
 ```
 

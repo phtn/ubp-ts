@@ -3,9 +3,8 @@ import type { ATMsResponse } from "./types/atms";
 import type {
   PaymentRequestV5,
   PaymentResponseV5,
-  PayBillsViaPartnerRequest,
-  PayBillsViaPartnerResponse,
-  BillsPaymentResponse,
+  // PayBillsViaPartnerRequest,
+  // PayBillsViaPartnerResponse,
   PaymayaRequest,
   PaymayaResponse,
   CoinsPHRequest,
@@ -59,13 +58,12 @@ import {
   getPartnerBillsPaymentStatus,
   payBillsAsCustomer,
   getCustomerBillsPaymentStatus,
-  type BillsPaymentRequest,
   type BillsPaymentStatus,
+  type BillsPaymentResponse,
 } from "./sdk/bills";
 import {
   replenishSandboxAccount,
   updateSandboxAccount,
-  type DepositRequest,
   type DepositResponse,
 } from "./sdk/deposits";
 import {
@@ -89,9 +87,18 @@ export interface UBPClientConfig {
   baseUrl?: string;
   fetchImpl?: Fetch;
   /** Optional hook called before each request */
-  onRequest?: (req: { url: string; options: RequestInit; endpoint: string }) => void | Promise<void>;
+  onRequest?: (req: {
+    url: string;
+    options: RequestInit;
+    endpoint: string;
+  }) => void | Promise<void>;
   /** Optional hook called after each response */
-  onResponse?: (res: { url: string; options: RequestInit; endpoint: string; response: Response }) => void | Promise<void>;
+  onResponse?: (res: {
+    url: string;
+    options: RequestInit;
+    endpoint: string;
+    response: Response;
+  }) => void | Promise<void>;
 }
 
 export class UBPClient {
@@ -102,7 +109,14 @@ export class UBPClient {
   private onRequest?: UBPClientConfig["onRequest"];
   private onResponse?: UBPClientConfig["onResponse"];
 
-  constructor({ clientId, clientSecret, baseUrl = "https://api-uat.unionbankph.com/partners/sb", fetchImpl = fetch, onRequest, onResponse }: UBPClientConfig) {
+  constructor({
+    clientId,
+    clientSecret,
+    baseUrl = "https://api-uat.unionbankph.com/partners/sb",
+    fetchImpl = fetch,
+    onRequest,
+    onResponse,
+  }: UBPClientConfig) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.baseUrl = baseUrl;
@@ -112,23 +126,32 @@ export class UBPClient {
   }
 
   // --- Internal helper for hooks ---
-  private async _fetchWithHooks(url: string, options: RequestInit, endpoint: string): Promise<Response> {
+  private async _fetchWithHooks(
+    url: string,
+    options: RequestInit,
+    endpoint: string,
+  ): Promise<Response> {
     if (this.onRequest) await this.onRequest({ url, options, endpoint });
     const res = await this.fetchImpl(url, options);
-    if (this.onResponse) await this.onResponse({ url, options, endpoint, response: res });
+    if (this.onResponse)
+      await this.onResponse({ url, options, endpoint, response: res });
     return res;
   }
 
   async getATMs(): Promise<ATMsResponse> {
-    const res = await this._fetchWithHooks(`${this.baseUrl}/locators/v1/atms`, {
-      method: "GET",
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json",
-        "x-ibm-client-id": this.clientId,
-        "x-ibm-client-secret": this.clientSecret,
+    const res = await this._fetchWithHooks(
+      `${this.baseUrl}/locators/v1/atms`,
+      {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          "x-ibm-client-id": this.clientId,
+          "x-ibm-client-secret": this.clientSecret,
+        },
       },
-    }, "getATMs");
+      "getATMs",
+    );
     if (!res.ok) {
       throw new Error(`Failed to fetch ATMs: ${res.status} ${res.statusText}`);
     }
@@ -144,25 +167,36 @@ export class UBPClient {
     accessToken: string;
     partnerId: string;
   }): Promise<PaymentResponseV5> {
-    const res = await this._fetchWithHooks(`${this.baseUrl}/merchants/v5/payments/single`, {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json",
-        "x-ibm-client-id": this.clientId,
-        "x-ibm-client-secret": this.clientSecret,
-        authorization: `Bearer ${accessToken}`,
-        "x-partner-id": partnerId,
+    const res = await this._fetchWithHooks(
+      `${this.baseUrl}/merchants/v5/payments/single`,
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          "x-ibm-client-id": this.clientId,
+          "x-ibm-client-secret": this.clientSecret,
+          authorization: `Bearer ${accessToken}`,
+          "x-partner-id": partnerId,
+        },
+        body: JSON.stringify(payment),
       },
-      body: JSON.stringify(payment),
-    }, "makePayment");
+      "makePayment",
+    );
     if (!res.ok) {
-      throw new Error(`Failed to make payment: ${res.status} ${res.statusText}`);
+      throw new Error(
+        `Failed to make payment: ${res.status} ${res.statusText}`,
+      );
     }
     return (await res.json()) as PaymentResponseV5;
   }
 
-  async payBillsAsPartner(params: Omit<Parameters<typeof payBillsAsPartner>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<BillsPaymentResponse> {
+  async payBillsAsPartner(
+    params: Omit<
+      Parameters<typeof payBillsAsPartner>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<BillsPaymentResponse> {
     return payBillsAsPartner({
       ...params,
       clientId: this.clientId,
@@ -172,7 +206,12 @@ export class UBPClient {
     });
   }
 
-  async getPartnerBillsPaymentStatus(params: Omit<Parameters<typeof getPartnerBillsPaymentStatus>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<BillsPaymentStatus> {
+  async getPartnerBillsPaymentStatus(
+    params: Omit<
+      Parameters<typeof getPartnerBillsPaymentStatus>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<BillsPaymentStatus> {
     return getPartnerBillsPaymentStatus({
       ...params,
       clientId: this.clientId,
@@ -182,7 +221,12 @@ export class UBPClient {
     });
   }
 
-  async payBillsAsCustomer(params: Omit<Parameters<typeof payBillsAsCustomer>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<BillsPaymentResponse> {
+  async payBillsAsCustomer(
+    params: Omit<
+      Parameters<typeof payBillsAsCustomer>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<BillsPaymentResponse> {
     return payBillsAsCustomer({
       ...params,
       clientId: this.clientId,
@@ -192,7 +236,12 @@ export class UBPClient {
     });
   }
 
-  async getCustomerBillsPaymentStatus(params: Omit<Parameters<typeof getCustomerBillsPaymentStatus>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<BillsPaymentStatus> {
+  async getCustomerBillsPaymentStatus(
+    params: Omit<
+      Parameters<typeof getCustomerBillsPaymentStatus>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<BillsPaymentStatus> {
     return getCustomerBillsPaymentStatus({
       ...params,
       clientId: this.clientId,
@@ -211,20 +260,26 @@ export class UBPClient {
     accessToken: string;
     partnerId: string;
   }): Promise<PaymayaResponse> {
-    const res = await this._fetchWithHooks(`${this.baseUrl}/paymaya/v2/topup`, {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json",
-        "x-ibm-client-id": this.clientId,
-        "x-ibm-client-secret": this.clientSecret,
-        authorization: `Bearer ${accessToken}`,
-        "x-partner-id": partnerId,
+    const res = await this._fetchWithHooks(
+      `${this.baseUrl}/paymaya/v2/topup`,
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          "x-ibm-client-id": this.clientId,
+          "x-ibm-client-secret": this.clientSecret,
+          authorization: `Bearer ${accessToken}`,
+          "x-partner-id": partnerId,
+        },
+        body: JSON.stringify(payment),
       },
-      body: JSON.stringify(payment),
-    }, "paymayaTopUp");
+      "paymayaTopUp",
+    );
     if (!res.ok) {
-      throw new Error(`Failed to top up Paymaya: ${res.status} ${res.statusText}`);
+      throw new Error(
+        `Failed to top up Paymaya: ${res.status} ${res.statusText}`,
+      );
     }
     return (await res.json()) as PaymayaResponse;
   }
@@ -238,25 +293,35 @@ export class UBPClient {
     accessToken: string;
     partnerId: string;
   }): Promise<CoinsPHResponse> {
-    const res = await this._fetchWithHooks(`${this.baseUrl}/coinsph/v2/topup`, {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json",
-        "x-ibm-client-id": this.clientId,
-        "x-ibm-client-secret": this.clientSecret,
-        authorization: `Bearer ${accessToken}`,
-        "x-partner-id": partnerId,
+    const res = await this._fetchWithHooks(
+      `${this.baseUrl}/coinsph/v2/topup`,
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          "x-ibm-client-id": this.clientId,
+          "x-ibm-client-secret": this.clientSecret,
+          authorization: `Bearer ${accessToken}`,
+          "x-partner-id": partnerId,
+        },
+        body: JSON.stringify(payment),
       },
-      body: JSON.stringify(payment),
-    }, "coinsPHTopUp");
+      "coinsPHTopUp",
+    );
     if (!res.ok) {
-      throw new Error(`Failed to top up Coins.ph: ${res.status} ${res.statusText}`);
+      throw new Error(
+        `Failed to top up Coins.ph: ${res.status} ${res.statusText}`,
+      );
     }
     return (await res.json()) as CoinsPHResponse;
   }
 
-  async getAccountInfo({ accessToken }: { accessToken: string }): Promise<AccountInformationResponse> {
+  async getAccountInfo({
+    accessToken,
+  }: {
+    accessToken: string;
+  }): Promise<AccountInformationResponse> {
     return getAccountInfo({
       clientId: this.clientId,
       clientSecret: this.clientSecret,
@@ -266,7 +331,15 @@ export class UBPClient {
     });
   }
 
-  async getCustomerAccountInfo({ accessToken, partnerId, body }: { accessToken: string; partnerId: string; body: OnlineAccountInformation }): Promise<OnlineAccountInformationResponse> {
+  async getCustomerAccountInfo({
+    accessToken,
+    partnerId,
+    body,
+  }: {
+    accessToken: string;
+    partnerId: string;
+    body: OnlineAccountInformation;
+  }): Promise<OnlineAccountInformationResponse> {
     return getCustomerAccountInfo({
       clientId: this.clientId,
       clientSecret: this.clientSecret,
@@ -278,7 +351,11 @@ export class UBPClient {
     });
   }
 
-  async createSandboxAccount({ body }: { body: SandboxRequest }): Promise<SandboxResponse> {
+  async createSandboxAccount({
+    body,
+  }: {
+    body: SandboxRequest;
+  }): Promise<SandboxResponse> {
     return createSandboxAccount({
       clientId: this.clientId,
       clientSecret: this.clientSecret,
@@ -288,7 +365,11 @@ export class UBPClient {
     });
   }
 
-  async getAccountBalance({ accountNumber }: { accountNumber: string }): Promise<AccountBalances> {
+  async getAccountBalance({
+    accountNumber,
+  }: {
+    accountNumber: string;
+  }): Promise<AccountBalances> {
     return getAccountBalance({
       clientId: this.clientId,
       clientSecret: this.clientSecret,
@@ -298,7 +379,15 @@ export class UBPClient {
     });
   }
 
-  async getPartnerAccountTransactionHistory({ accessToken, partnerId, query }: { accessToken: string; partnerId: string; query?: Record<string, string> }): Promise<AccountHistoryResponse> {
+  async getPartnerAccountTransactionHistory({
+    accessToken,
+    partnerId,
+    query,
+  }: {
+    accessToken: string;
+    partnerId: string;
+    query?: Record<string, string>;
+  }): Promise<AccountHistoryResponse> {
     return getPartnerAccountTransactionHistory({
       clientId: this.clientId,
       clientSecret: this.clientSecret,
@@ -310,7 +399,15 @@ export class UBPClient {
     });
   }
 
-  async getCustomerAccountTransactionHistory({ accessToken, partnerId, query }: { accessToken: string; partnerId: string; query?: Record<string, string> }): Promise<AccountHistoryResponse> {
+  async getCustomerAccountTransactionHistory({
+    accessToken,
+    partnerId,
+    query,
+  }: {
+    accessToken: string;
+    partnerId: string;
+    query?: Record<string, string>;
+  }): Promise<AccountHistoryResponse> {
     return getCustomerAccountTransactionHistory({
       clientId: this.clientId,
       clientSecret: this.clientSecret,
@@ -323,7 +420,12 @@ export class UBPClient {
   }
 
   // --- Transfers ---
-  async transferIntrabank(params: Omit<Parameters<typeof transferIntrabank>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"> & { body: TransferRequestv3 }): Promise<TransferResponsev3> {
+  async transferIntrabank(
+    params: Omit<
+      Parameters<typeof transferIntrabank>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    > & { body: TransferRequestv3 },
+  ): Promise<TransferResponsev3> {
     return transferIntrabank({
       ...params,
       clientId: this.clientId,
@@ -333,7 +435,12 @@ export class UBPClient {
     });
   }
 
-  async getIntrabankTransferStatus(params: Omit<Parameters<typeof getIntrabankTransferStatus>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<TransferResponsev3> {
+  async getIntrabankTransferStatus(
+    params: Omit<
+      Parameters<typeof getIntrabankTransferStatus>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<TransferResponsev3> {
     return getIntrabankTransferStatus({
       ...params,
       clientId: this.clientId,
@@ -343,7 +450,12 @@ export class UBPClient {
     });
   }
 
-  async transferPesonetPartner(params: Omit<Parameters<typeof transferPesonetPartner>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"> & { body: PesonetRequest3 }): Promise<PesonetResponse3> {
+  async transferPesonetPartner(
+    params: Omit<
+      Parameters<typeof transferPesonetPartner>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    > & { body: PesonetRequest3 },
+  ): Promise<PesonetResponse3> {
     return transferPesonetPartner({
       ...params,
       clientId: this.clientId,
@@ -353,7 +465,12 @@ export class UBPClient {
     });
   }
 
-  async getPesonetPartnerTransferStatus(params: Omit<Parameters<typeof getPesonetPartnerTransferStatus>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<PesonetResponse3> {
+  async getPesonetPartnerTransferStatus(
+    params: Omit<
+      Parameters<typeof getPesonetPartnerTransferStatus>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<PesonetResponse3> {
     return getPesonetPartnerTransferStatus({
       ...params,
       clientId: this.clientId,
@@ -363,7 +480,12 @@ export class UBPClient {
     });
   }
 
-  async transferInstapayPartner(params: Omit<Parameters<typeof transferInstapayPartner>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"> & { body: InstapayRequest3 }): Promise<InstapayResponse3> {
+  async transferInstapayPartner(
+    params: Omit<
+      Parameters<typeof transferInstapayPartner>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    > & { body: InstapayRequest3 },
+  ): Promise<InstapayResponse3> {
     return transferInstapayPartner({
       ...params,
       clientId: this.clientId,
@@ -373,7 +495,12 @@ export class UBPClient {
     });
   }
 
-  async getInstapayPartnerTransferStatus(params: Omit<Parameters<typeof getInstapayPartnerTransferStatus>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<InstapayResponse3> {
+  async getInstapayPartnerTransferStatus(
+    params: Omit<
+      Parameters<typeof getInstapayPartnerTransferStatus>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<InstapayResponse3> {
     return getInstapayPartnerTransferStatus({
       ...params,
       clientId: this.clientId,
@@ -383,7 +510,12 @@ export class UBPClient {
     });
   }
 
-  async transferPesonetCustomer(params: Omit<Parameters<typeof transferPesonetCustomer>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"> & { body: OutwardRequest }): Promise<OutwardResponse> {
+  async transferPesonetCustomer(
+    params: Omit<
+      Parameters<typeof transferPesonetCustomer>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    > & { body: OutwardRequest },
+  ): Promise<OutwardResponse> {
     return transferPesonetCustomer({
       ...params,
       clientId: this.clientId,
@@ -393,7 +525,12 @@ export class UBPClient {
     });
   }
 
-  async getPesonetCustomerTransferStatus(params: Omit<Parameters<typeof getPesonetCustomerTransferStatus>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<OutwardResponse> {
+  async getPesonetCustomerTransferStatus(
+    params: Omit<
+      Parameters<typeof getPesonetCustomerTransferStatus>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<OutwardResponse> {
     return getPesonetCustomerTransferStatus({
       ...params,
       clientId: this.clientId,
@@ -403,7 +540,12 @@ export class UBPClient {
     });
   }
 
-  async transferInstapayCustomer(params: Omit<Parameters<typeof transferInstapayCustomer>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"> & { body: OnlineInstapayRequest }): Promise<OnlineInstapayResponse> {
+  async transferInstapayCustomer(
+    params: Omit<
+      Parameters<typeof transferInstapayCustomer>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    > & { body: OnlineInstapayRequest },
+  ): Promise<OnlineInstapayResponse> {
     return transferInstapayCustomer({
       ...params,
       clientId: this.clientId,
@@ -413,7 +555,12 @@ export class UBPClient {
     });
   }
 
-  async getInstapayCustomerTransferStatus(params: Omit<Parameters<typeof getInstapayCustomerTransferStatus>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<OnlineInstapayResponse> {
+  async getInstapayCustomerTransferStatus(
+    params: Omit<
+      Parameters<typeof getInstapayCustomerTransferStatus>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<OnlineInstapayResponse> {
     return getInstapayCustomerTransferStatus({
       ...params,
       clientId: this.clientId,
@@ -423,7 +570,12 @@ export class UBPClient {
     });
   }
 
-  async transferPesonetEON(params: Omit<Parameters<typeof transferPesonetEON>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"> & { body: EONWalletInstapayRequest }): Promise<EONWalletInstapayResponse> {
+  async transferPesonetEON(
+    params: Omit<
+      Parameters<typeof transferPesonetEON>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    > & { body: EONWalletInstapayRequest },
+  ): Promise<EONWalletInstapayResponse> {
     return transferPesonetEON({
       ...params,
       clientId: this.clientId,
@@ -433,7 +585,12 @@ export class UBPClient {
     });
   }
 
-  async transferInstapayEON(params: Omit<Parameters<typeof transferInstapayEON>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"> & { body: EONWalletInstapayRequest }): Promise<EONWalletInstapayResponse> {
+  async transferInstapayEON(
+    params: Omit<
+      Parameters<typeof transferInstapayEON>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    > & { body: EONWalletInstapayRequest },
+  ): Promise<EONWalletInstapayResponse> {
     return transferInstapayEON({
       ...params,
       clientId: this.clientId,
@@ -443,7 +600,12 @@ export class UBPClient {
     });
   }
 
-  async getInstapayBanks(params: Omit<Parameters<typeof getInstapayBanks>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<any> {
+  async getInstapayBanks(
+    params: Omit<
+      Parameters<typeof getInstapayBanks>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<InstapayResponse3> {
     return getInstapayBanks({
       ...params,
       clientId: this.clientId,
@@ -453,7 +615,12 @@ export class UBPClient {
     });
   }
 
-  async getPesonetBanks(params: Omit<Parameters<typeof getPesonetBanks>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<any> {
+  async getPesonetBanks(
+    params: Omit<
+      Parameters<typeof getPesonetBanks>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<InstapayResponse3> {
     return getPesonetBanks({
       ...params,
       clientId: this.clientId,
@@ -463,7 +630,12 @@ export class UBPClient {
     });
   }
 
-  async replenishSandboxAccount(params: Omit<Parameters<typeof replenishSandboxAccount>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<DepositResponse> {
+  async replenishSandboxAccount(
+    params: Omit<
+      Parameters<typeof replenishSandboxAccount>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<DepositResponse> {
     return replenishSandboxAccount({
       ...params,
       clientId: this.clientId,
@@ -473,7 +645,12 @@ export class UBPClient {
     });
   }
 
-  async updateSandboxAccount(params: Omit<Parameters<typeof updateSandboxAccount>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<DepositResponse> {
+  async updateSandboxAccount(
+    params: Omit<
+      Parameters<typeof updateSandboxAccount>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<DepositResponse> {
     return updateSandboxAccount({
       ...params,
       clientId: this.clientId,
@@ -483,7 +660,12 @@ export class UBPClient {
     });
   }
 
-  async getCreditCardStatementSummary(params: Omit<Parameters<typeof getCreditCardStatementSummary>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<CreditCardInquiryStatementSummary> {
+  async getCreditCardStatementSummary(
+    params: Omit<
+      Parameters<typeof getCreditCardStatementSummary>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<CreditCardInquiryStatementSummary> {
     return getCreditCardStatementSummary({
       ...params,
       clientId: this.clientId,
@@ -493,7 +675,12 @@ export class UBPClient {
     });
   }
 
-  async getCreditCardStatements(params: Omit<Parameters<typeof getCreditCardStatements>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<CreditCardInquiryStatements> {
+  async getCreditCardStatements(
+    params: Omit<
+      Parameters<typeof getCreditCardStatements>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<CreditCardInquiryStatements> {
     return getCreditCardStatements({
       ...params,
       clientId: this.clientId,
@@ -503,7 +690,12 @@ export class UBPClient {
     });
   }
 
-  async getCreditCardUnbilled(params: Omit<Parameters<typeof getCreditCardUnbilled>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<CreditCardInquiryUnbilled> {
+  async getCreditCardUnbilled(
+    params: Omit<
+      Parameters<typeof getCreditCardUnbilled>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<CreditCardInquiryUnbilled> {
     return getCreditCardUnbilled({
       ...params,
       clientId: this.clientId,
@@ -513,7 +705,12 @@ export class UBPClient {
     });
   }
 
-  async getCreditCardBalances(params: Omit<Parameters<typeof getCreditCardBalances>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<CreditCardInquiryBalances> {
+  async getCreditCardBalances(
+    params: Omit<
+      Parameters<typeof getCreditCardBalances>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<CreditCardInquiryBalances> {
     return getCreditCardBalances({
       ...params,
       clientId: this.clientId,
@@ -523,7 +720,12 @@ export class UBPClient {
     });
   }
 
-  async getCreditCardCards(params: Omit<Parameters<typeof getCreditCardCards>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<CreditCardInquiryCards> {
+  async getCreditCardCards(
+    params: Omit<
+      Parameters<typeof getCreditCardCards>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<CreditCardInquiryCards> {
     return getCreditCardCards({
       ...params,
       clientId: this.clientId,
@@ -533,7 +735,12 @@ export class UBPClient {
     });
   }
 
-  async getCreditCardPromos(params: Omit<Parameters<typeof getCreditCardPromos>[0], "clientId" | "clientSecret" | "fetchImpl" | "baseUrl">): Promise<CreditCardPromos> {
+  async getCreditCardPromos(
+    params: Omit<
+      Parameters<typeof getCreditCardPromos>[0],
+      "clientId" | "clientSecret" | "fetchImpl" | "baseUrl"
+    >,
+  ): Promise<CreditCardPromos> {
     return getCreditCardPromos({
       ...params,
       clientId: this.clientId,
@@ -542,4 +749,4 @@ export class UBPClient {
       baseUrl: this.baseUrl,
     });
   }
-} 
+}
