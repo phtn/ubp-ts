@@ -1,7 +1,7 @@
 import type { Fetch } from "../types/fetch";
 import type { components } from "../types/openapi.generated";
 import { throwUBPError } from "../utils/errorHelpers";
-import { requireParam, requireType } from "../utils/validation";
+import { requireParam } from "../utils/validation";
 
 export type DepositRequest = components["schemas"]["DepositRequest"];
 export type DepositResponse = components["schemas"]["DepositResponse"];
@@ -75,4 +75,4 @@ export async function updateSandboxAccount({
   });
   if (!res.ok) throw await throwUBPError(res);
   return (await res.json()) as DepositResponse;
-} 
+}

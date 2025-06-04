@@ -1,27 +1,26 @@
 import type { Fetch } from "../types/fetch";
 import type { components } from "../types/openapi.generated";
 import { throwUBPError } from "../utils/errorHelpers";
-import { requireParam, requireType } from "../utils/validation";
+import { requireParam } from "../utils/validation";
 
 // Types
 export type TransferRequestv3 = components["schemas"]["TransferRequestv3"];
 export type TransferResponsev3 = components["schemas"]["TransferResponsev3"];
 export type TransferErrorv3 = components["schemas"]["TransferErrorv3"];
 export type TransferError500v3 = components["schemas"]["TransferError500v3"];
-export type PesonetRequest3 = any; // TODO: type from openapi.generated
-export type PesonetResponse3 = any; // TODO: type from openapi.generated
-export type PesonetResponseTF3 = any; // TODO: type from openapi.generated
-export type InstapayRequest3 = any; // TODO: type from openapi.generated
-export type InstapayResponse3 = any; // TODO: type from openapi.generated
-export type InstapayResponseTF3 = any; // TODO: type from openapi.generated
+export type InstapayRequest3 = components["schemas"]["InstapayRequest3"];
+export type InstapayResponse3 = components["schemas"]["InstapayResponse3"];
+export type OnlineInstapayRequest = components["schemas"]["OnlineInstapayRequest"];
+export type OnlineInstapayResponse = components["schemas"]["OnlineInstapayResponse"];
 export type OutwardRequest = components["schemas"]["OutwardRequest"];
 export type OutwardResponse = components["schemas"]["OutwardResponse"];
 export type OutwardError = components["schemas"]["OutwardError"];
-export type OnlineInstapayRequest = any; // TODO: type from openapi.generated
-export type OnlineInstapayResponse = any; // TODO: type from openapi.generated
-export type OnlineInstapayError = any; // TODO: type from openapi.generated
-export type EONWalletInstapayRequest = any; // TODO: type from openapi.generated
-export type EONWalletInstapayResponse = any; // TODO: type from openapi.generated
+export type OnlineInstapayError = components["schemas"]["OnlineInstapayError"];
+export type EONWalletInstapayRequest = components["schemas"]["EONWalletInstapayRequest"];
+export type EONWalletInstapayResponse = components["schemas"]["EONWalletInstapayResponse"];
+export type SingleRequestV3 = components["schemas"]["SingleRequestv3"]; // TODO: type from openapi.generated
+export type SingleResponseV3 = components["schemas"]["SingleResponsev3"]; // TODO: type from openapi.generated
+export type RetrieveResponsev3 = components["schemas"]["RetrieveResponsev3"];
 
 // 1. UnionBank-to-UnionBank (Intrabank) Transfer
 export async function transferIntrabank({
@@ -87,17 +86,20 @@ export async function getIntrabankTransferStatus({
   requireParam(partnerId, "partnerId");
   requireParam(senderRefId, "senderRefId");
 
-  const res = await fetchImpl(`${baseUrl}/partners/v3/transfers/single/${senderRefId}`, {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/partners/v3/transfers/single/${senderRefId}`,
+    {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
     },
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
   return (await res.json()) as TransferResponsev3;
 }
@@ -116,30 +118,33 @@ export async function transferPesonetPartner({
   clientSecret: string;
   accessToken: string;
   partnerId: string;
-  body: PesonetRequest3;
+  body: SingleRequestV3;
   fetchImpl?: Fetch;
   baseUrl?: string;
-}): Promise<PesonetResponse3> {
+}): Promise<SingleResponseV3> {
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
   requireParam(accessToken, "accessToken");
   requireParam(partnerId, "partnerId");
   requireParam(body, "body");
 
-  const res = await fetchImpl(`${baseUrl}/partners/v3/pesonet/transfers/single`, {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/partners/v3/pesonet/transfers/single`,
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
-  return (await res.json()) as PesonetResponse3;
+  return (await res.json()) as SingleResponseV3;
 }
 
 // 2b. Partner PESONet Transfer Status
@@ -159,26 +164,29 @@ export async function getPesonetPartnerTransferStatus({
   senderRefId: string;
   fetchImpl?: Fetch;
   baseUrl?: string;
-}): Promise<PesonetResponse3> {
+}): Promise<SingleResponseV3> {
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
   requireParam(accessToken, "accessToken");
   requireParam(partnerId, "partnerId");
   requireParam(senderRefId, "senderRefId");
 
-  const res = await fetchImpl(`${baseUrl}/partners/v3/pesonet/transfers/single/${senderRefId}`, {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/partners/v3/pesonet/transfers/single/${senderRefId}`,
+    {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
     },
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
-  return (await res.json()) as PesonetResponse3;
+  return (await res.json()) as SingleResponseV3;
 }
 
 // 3. Partner InstaPay Transfer
@@ -195,30 +203,33 @@ export async function transferInstapayPartner({
   clientSecret: string;
   accessToken: string;
   partnerId: string;
-  body: InstapayRequest3;
+  body: SingleRequestV3;
   fetchImpl?: Fetch;
   baseUrl?: string;
-}): Promise<InstapayResponse3> {
+}): Promise<SingleResponseV3> {
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
   requireParam(accessToken, "accessToken");
   requireParam(partnerId, "partnerId");
   requireParam(body, "body");
 
-  const res = await fetchImpl(`${baseUrl}/partners/v3/instapay/transfers/single`, {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/partners/v3/instapay/transfers/single`,
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
-  return (await res.json()) as InstapayResponse3;
+  return (await res.json()) as SingleResponseV3;
 }
 
 // 3b. Partner InstaPay Transfer Status
@@ -238,26 +249,29 @@ export async function getInstapayPartnerTransferStatus({
   senderRefId: string;
   fetchImpl?: Fetch;
   baseUrl?: string;
-}): Promise<InstapayResponse3> {
+}): Promise<SingleResponseV3> {
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
   requireParam(accessToken, "accessToken");
   requireParam(partnerId, "partnerId");
   requireParam(senderRefId, "senderRefId");
 
-  const res = await fetchImpl(`${baseUrl}/partners/v3/instapay/transfers/single/${senderRefId}`, {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/partners/v3/instapay/transfers/single/${senderRefId}`,
+    {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
     },
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
-  return (await res.json()) as InstapayResponse3;
+  return (await res.json()) as SingleResponseV3;
 }
 
 // 4. Customer PESONet Transfer
@@ -324,17 +338,20 @@ export async function getPesonetCustomerTransferStatus({
   requireParam(partnerId, "partnerId");
   requireParam(senderRefId, "senderRefId");
 
-  const res = await fetchImpl(`${baseUrl}/online/v2/pesonet/transfers/single/${senderRefId}`, {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/online/v2/pesonet/transfers/single/${senderRefId}`,
+    {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
     },
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
   return (await res.json()) as OutwardResponse;
 }
@@ -353,30 +370,33 @@ export async function transferInstapayCustomer({
   clientSecret: string;
   accessToken: string;
   partnerId: string;
-  body: OnlineInstapayRequest;
+  body: SingleRequestV3;
   fetchImpl?: Fetch;
   baseUrl?: string;
-}): Promise<OnlineInstapayResponse> {
+}): Promise<SingleResponseV3> {
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
   requireParam(accessToken, "accessToken");
   requireParam(partnerId, "partnerId");
   requireParam(body, "body");
 
-  const res = await fetchImpl(`${baseUrl}/online/v2/instapay/transfers/single`, {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/online/v2/instapay/transfers/single`,
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
-  return (await res.json()) as OnlineInstapayResponse;
+  return (await res.json()) as SingleResponseV3;
 }
 
 // 5b. Customer InstaPay Transfer Status
@@ -396,26 +416,29 @@ export async function getInstapayCustomerTransferStatus({
   senderRefId: string;
   fetchImpl?: Fetch;
   baseUrl?: string;
-}): Promise<OnlineInstapayResponse> {
+}): Promise<SingleResponseV3> {
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
   requireParam(accessToken, "accessToken");
   requireParam(partnerId, "partnerId");
   requireParam(senderRefId, "senderRefId");
 
-  const res = await fetchImpl(`${baseUrl}/online/v2/instapay/transfers/single/${senderRefId}`, {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/online/v2/instapay/transfers/single/${senderRefId}`,
+    {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
     },
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
-  return (await res.json()) as OnlineInstapayResponse;
+  return (await res.json()) as SingleResponseV3;
 }
 
 // 6. EON Wallet PESONet Transfer
@@ -442,18 +465,21 @@ export async function transferPesonetEON({
   requireParam(partnerId, "partnerId");
   requireParam(body, "body");
 
-  const res = await fetchImpl(`${baseUrl}/partners/eon/wallet/v1/pesonet/transfers`, {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/partners/eon/wallet/v1/pesonet/transfers`,
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
   return (await res.json()) as EONWalletInstapayResponse;
 }
@@ -482,18 +508,21 @@ export async function transferInstapayEON({
   requireParam(partnerId, "partnerId");
   requireParam(body, "body");
 
-  const res = await fetchImpl(`${baseUrl}/partners/eon/wallet/v3/instapay/transfers`, {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/partners/eon/wallet/v3/instapay/transfers`,
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
   return (await res.json()) as EONWalletInstapayResponse;
 }
@@ -513,7 +542,7 @@ export async function getInstapayBanks({
   partnerId: string;
   fetchImpl?: Fetch;
   baseUrl?: string;
-}): Promise<any> {
+}): Promise<SingleResponseV3> {
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
   requireParam(accessToken, "accessToken");
@@ -531,7 +560,7 @@ export async function getInstapayBanks({
     },
   });
   if (!res.ok) throw await throwUBPError(res);
-  return await res.json();
+  return (await res.json()) as SingleResponseV3;
 }
 
 export async function getPesonetBanks({
@@ -548,7 +577,7 @@ export async function getPesonetBanks({
   partnerId: string;
   fetchImpl?: Fetch;
   baseUrl?: string;
-}): Promise<any> {
+}): Promise<SingleResponseV3> {
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
   requireParam(accessToken, "accessToken");
@@ -566,5 +595,5 @@ export async function getPesonetBanks({
     },
   });
   if (!res.ok) throw await throwUBPError(res);
-  return await res.json();
-} 
+  return (await res.json()) as SingleResponseV3;
+}

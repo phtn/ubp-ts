@@ -1,11 +1,12 @@
 import type { Fetch } from "../types/fetch";
 import type { components } from "../types/openapi.generated";
 import { throwUBPError } from "../utils/errorHelpers";
-import { requireParam, requireType } from "../utils/validation";
+import { requireParam } from "../utils/validation";
 
 // Types
 export type BillsPaymentRequest = components["schemas"]["BillsPaymentRequest"];
-export type BillsPaymentResponse = components["schemas"]["BillsPaymentResponse"];
+export type BillsPaymentResponse =
+  components["schemas"]["BillsPaymentResponse"];
 export type BillsPaymentStatus = components["schemas"]["BillsPaymentStatus"];
 
 // 1. Pay Bills as Partner
@@ -65,17 +66,20 @@ export async function getPartnerBillsPaymentStatus({
   fetchImpl?: Fetch;
   baseUrl?: string;
 }): Promise<BillsPaymentStatus> {
-  const res = await fetchImpl(`${baseUrl}/partners/v3/payments/single/${senderRefId}`, {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/partners/v3/payments/single/${senderRefId}`,
+    {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
     },
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
   return (await res.json()) as BillsPaymentStatus;
 }
@@ -142,17 +146,20 @@ export async function getCustomerBillsPaymentStatus({
   requireParam(accessToken, "accessToken");
   requireParam(partnerId, "partnerId");
   requireParam(senderRefId, "senderRefId");
-  const res = await fetchImpl(`${baseUrl}/customers/v3/payments/single/${senderRefId}`, {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "x-ibm-client-id": clientId,
-      "x-ibm-client-secret": clientSecret,
-      authorization: `Bearer ${accessToken}`,
-      "x-partner-id": partnerId,
+  const res = await fetchImpl(
+    `${baseUrl}/customers/v3/payments/single/${senderRefId}`,
+    {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "x-ibm-client-id": clientId,
+        "x-ibm-client-secret": clientSecret,
+        authorization: `Bearer ${accessToken}`,
+        "x-partner-id": partnerId,
+      },
     },
-  });
+  );
   if (!res.ok) throw await throwUBPError(res);
   return (await res.json()) as BillsPaymentStatus;
-} 
+}

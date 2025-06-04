@@ -1,4 +1,4 @@
-import { requireParam, requireType } from "../utils/validation";
+import { requireParam } from "../utils/validation";
 
 export interface AccessTokenResponse {
   token_type: "bearer";
@@ -32,7 +32,7 @@ export async function authenticatePartner({
   password,
   scope = "",
   fetchImpl = fetch,
-  baseUrl = "https://api-uat.unionbankph.com/partners/sb"
+  baseUrl = "https://api-uat.unionbankph.com/partners/sb",
 }: PartnerAuthParams): Promise<AccessTokenResponse> {
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
@@ -48,13 +48,15 @@ export async function authenticatePartner({
   const res = await fetchImpl(`${baseUrl}/partners/v1/oauth2/token`, {
     method: "POST",
     headers: {
-      "accept": "application/json",
+      accept: "application/json",
       "content-type": "application/x-www-form-urlencoded",
     },
     body,
   });
   if (!res.ok) {
-    throw new Error(`Failed to authenticate partner: ${res.status} ${res.statusText}`);
+    throw new Error(
+      `Failed to authenticate partner: ${res.status} ${res.statusText}`,
+    );
   }
   return (await res.json()) as AccessTokenResponse;
 }
@@ -73,7 +75,7 @@ export async function authenticateCustomer({
   code,
   redirectUri,
   fetchImpl = fetch,
-  baseUrl = "https://api-uat.unionbankph.com/partners/sb"
+  baseUrl = "https://api-uat.unionbankph.com/partners/sb",
 }: CustomerAuthParams): Promise<AccessTokenResponse> {
   requireParam(clientId, "clientId");
   requireParam(code, "code");
@@ -87,13 +89,15 @@ export async function authenticateCustomer({
   const res = await fetchImpl(`${baseUrl}/customers/v1/oauth2/token`, {
     method: "POST",
     headers: {
-      "accept": "application/json",
+      accept: "application/json",
       "content-type": "application/x-www-form-urlencoded",
     },
     body,
   });
   if (!res.ok) {
-    throw new Error(`Failed to authenticate customer: ${res.status} ${res.statusText}`);
+    throw new Error(
+      `Failed to authenticate customer: ${res.status} ${res.statusText}`,
+    );
   }
   return (await res.json()) as AccessTokenResponse;
-} 
+}
