@@ -241,7 +241,7 @@ export async function getCustomerCards({
   customerId: string;
   fetchImpl?: Fetch;
   baseUrl?: string;
-}): Promise<any> {
+}): Promise<unknown> {
   const res = await fetchImpl(
     `${baseUrl}/partners/eon/wallet/v1/customers/${customerId}/cards`,
     {
