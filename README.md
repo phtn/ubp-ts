@@ -1,4 +1,4 @@
-# UnionBank TypeScript SDK (Pure Functional)
+# UnionBank TypeScript SDK
 
 ![CI](https://github.com/phtn/ubp-ts/actions/workflows/ci.yml/badge.svg)
 
@@ -148,7 +148,11 @@ const customerAccountInfo = await getCustomerAccountInfo({
 const sandboxAccount = await createSandboxAccount({
   clientId: "your-client-id",
   clientSecret: "your-client-secret",
-  body: { username: "jdelacruz", password: "password", account_name: "Juan Dela Cruz" },
+  body: {
+    username: "jdelacruz",
+    password: "password",
+    account_name: "Juan Dela Cruz",
+  },
 });
 
 // Retrieve Account Balance
@@ -184,7 +188,9 @@ const intrabankResult = await transferIntrabank({
   clientSecret: "your-client-secret",
   accessToken: "partner-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...TransferRequestv3... */},
+  body: {
+    /* ...TransferRequestv3... */
+  },
 });
 
 // Intrabank Transfer Status
@@ -202,7 +208,9 @@ const pesonetPartnerResult = await transferPesonetPartner({
   clientSecret: "your-client-secret",
   accessToken: "partner-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...PesonetRequest3... */},
+  body: {
+    /* ...PesonetRequest3... */
+  },
 });
 
 // Partner PESONet Transfer Status
@@ -220,7 +228,9 @@ const instapayPartnerResult = await transferInstapayPartner({
   clientSecret: "your-client-secret",
   accessToken: "partner-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...InstapayRequest3... */},
+  body: {
+    /* ...InstapayRequest3... */
+  },
 });
 
 // Partner InstaPay Transfer Status
@@ -238,7 +248,9 @@ const pesonetCustomerResult = await transferPesonetCustomer({
   clientSecret: "your-client-secret",
   accessToken: "customer-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...OutwardRequest... */},
+  body: {
+    /* ...OutwardRequest... */
+  },
 });
 
 // Customer PESONet Transfer Status
@@ -256,7 +268,9 @@ const instapayCustomerResult = await transferInstapayCustomer({
   clientSecret: "your-client-secret",
   accessToken: "customer-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...OnlineInstapayRequest... */},
+  body: {
+    /* ...OnlineInstapayRequest... */
+  },
 });
 
 // Customer InstaPay Transfer Status
@@ -274,7 +288,9 @@ const pesonetEONResult = await transferPesonetEON({
   clientSecret: "your-client-secret",
   accessToken: "partner-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...EONWalletInstapayRequest... */},
+  body: {
+    /* ...EONWalletInstapayRequest... */
+  },
 });
 
 // EON Wallet InstaPay Transfer
@@ -283,7 +299,9 @@ const instapayEONResult = await transferInstapayEON({
   clientSecret: "your-client-secret",
   accessToken: "partner-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...EONWalletInstapayRequest... */},
+  body: {
+    /* ...EONWalletInstapayRequest... */
+  },
 });
 
 // Get Instapay Banks
@@ -317,9 +335,7 @@ const billsPartnerResult = await payBillsAsPartner({
     amount: { currency: "PHP", value: "100" },
     remarks: "Payment remarks",
     particulars: "Payment particulars",
-    references: [
-      { index: 1, name: "Payor", value: "1231231212" },
-    ],
+    references: [{ index: 1, name: "Payor", value: "1231231212" }],
   },
 });
 
@@ -345,9 +361,7 @@ const billsCustomerResult = await payBillsAsCustomer({
     amount: { currency: "PHP", value: "100" },
     remarks: "Payment remarks",
     particulars: "Payment particulars",
-    references: [
-      { index: 1, name: "Payor", value: "1231231212" },
-    ],
+    references: [{ index: 1, name: "Payor", value: "1231231212" }],
   },
 });
 
@@ -430,7 +444,9 @@ const merchantPayment = await makeMerchantPayment({
   clientSecret: "your-client-secret",
   accessToken: "partner-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...PaymentRequestv5... */},
+  body: {
+    /* ...PaymentRequestv5... */
+  },
 });
 
 // Get Merchant Payment Status
@@ -471,7 +487,9 @@ const atms = await ubp.getATMs();
 const branches = await ubp.getBranches();
 
 // Get Account Details
-const accountInfo = await ubp.getAccountInfo({ accessToken: "partner-or-customer-access-token" });
+const accountInfo = await ubp.getAccountInfo({
+  accessToken: "partner-or-customer-access-token",
+});
 
 // Fetch Forex Rates
 const forexRates = await ubp.getForexRates();
@@ -485,7 +503,11 @@ const customerAccountInfo = await ubp.getCustomerAccountInfo({
 
 // Create Sandbox Bank Account
 const sandboxAccount = await ubp.createSandboxAccount({
-  body: { username: "jdelacruz", password: "password", account_name: "Juan Dela Cruz" },
+  body: {
+    username: "jdelacruz",
+    password: "password",
+    account_name: "Juan Dela Cruz",
+  },
 });
 
 // Retrieve Account Balance
@@ -511,7 +533,9 @@ const customerHistory = await ubp.getCustomerAccountTransactionHistory({
 const intrabankResult = await ubp.transferIntrabank({
   accessToken: "partner-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...TransferRequestv3... */},
+  body: {
+    /* ...TransferRequestv3... */
+  },
 });
 
 // Intrabank Transfer Status
@@ -525,7 +549,9 @@ const intrabankStatus = await ubp.getIntrabankTransferStatus({
 const pesonetPartnerResult = await ubp.transferPesonetPartner({
   accessToken: "partner-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...PesonetRequest3... */},
+  body: {
+    /* ...PesonetRequest3... */
+  },
 });
 
 // Partner PESONet Transfer Status
@@ -539,7 +565,9 @@ const pesonetPartnerStatus = await ubp.getPesonetPartnerTransferStatus({
 const instapayPartnerResult = await ubp.transferInstapayPartner({
   accessToken: "partner-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...InstapayRequest3... */},
+  body: {
+    /* ...InstapayRequest3... */
+  },
 });
 
 // Partner InstaPay Transfer Status
@@ -553,7 +581,9 @@ const instapayPartnerStatus = await ubp.getInstapayPartnerTransferStatus({
 const pesonetCustomerResult = await ubp.transferPesonetCustomer({
   accessToken: "customer-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...OutwardRequest... */},
+  body: {
+    /* ...OutwardRequest... */
+  },
 });
 
 // Customer PESONet Transfer Status
@@ -567,7 +597,9 @@ const pesonetCustomerStatus = await ubp.getPesonetCustomerTransferStatus({
 const instapayCustomerResult = await ubp.transferInstapayCustomer({
   accessToken: "customer-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...OnlineInstapayRequest... */},
+  body: {
+    /* ...OnlineInstapayRequest... */
+  },
 });
 
 // Customer InstaPay Transfer Status
@@ -581,14 +613,18 @@ const instapayCustomerStatus = await ubp.getInstapayCustomerTransferStatus({
 const pesonetEONResult = await ubp.transferPesonetEON({
   accessToken: "partner-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...EONWalletInstapayRequest... */},
+  body: {
+    /* ...EONWalletInstapayRequest... */
+  },
 });
 
 // EON Wallet InstaPay Transfer
 const instapayEONResult = await ubp.transferInstapayEON({
   accessToken: "partner-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...EONWalletInstapayRequest... */},
+  body: {
+    /* ...EONWalletInstapayRequest... */
+  },
 });
 
 // Get Instapay Banks
@@ -616,9 +652,7 @@ const billsPartnerResult = await ubp.payBillsAsPartner({
     amount: { currency: "PHP", value: "100" },
     remarks: "Payment remarks",
     particulars: "Payment particulars",
-    references: [
-      { index: 1, name: "Payor", value: "1231231212" },
-    ],
+    references: [{ index: 1, name: "Payor", value: "1231231212" }],
   },
 });
 
@@ -640,9 +674,7 @@ const billsCustomerResult = await ubp.payBillsAsCustomer({
     amount: { currency: "PHP", value: "100" },
     remarks: "Payment remarks",
     particulars: "Payment particulars",
-    references: [
-      { index: 1, name: "Payor", value: "1231231212" },
-    ],
+    references: [{ index: 1, name: "Payor", value: "1231231212" }],
   },
 });
 
@@ -705,7 +737,9 @@ const ccPromos = await ubp.getCreditCardPromos({
 const merchantPayment = await ubp.makeMerchantPayment({
   accessToken: "partner-access-token",
   partnerId: "your-partner-id",
-  body: {/* ...PaymentRequestv5... */},
+  body: {
+    /* ...PaymentRequestv5... */
+  },
 });
 
 // Get Merchant Payment Status
@@ -753,6 +787,7 @@ try {
 ---
 
 ## Features
+
 - Pure functional, no classes or singletons
 - All types generated from OpenAPI
 - Transport-agnostic (inject your own fetch if needed)
