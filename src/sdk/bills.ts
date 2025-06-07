@@ -163,3 +163,4 @@ export async function getCustomerBillsPaymentStatus({
   if (!res.ok) throw await throwUBPError(res);
   return (await res.json()) as BillsPaymentStatus;
 }
+ 

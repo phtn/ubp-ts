@@ -1,54 +1,28 @@
 # UnionBank TypeScript SDK
 
 ![CI](https://github.com/phtn/ubp-ts/actions/workflows/ci.yml/badge.svg)
-
 ![Test Status](https://img.shields.io/badge/tests-passing-brightgreen?style=flat-square)
 ![Coverage](https://img.shields.io/badge/coverage-bun--test-informational?style=flat-square)
 
 ---
 
-## Test Status
+## Available APIs
 
-All core SDK modules are covered by automated tests for parameter validation and error handling. All tests pass with Bun:
-
-```bash
-bun test
-```
-
----
-
-## Code Coverage
-
-Bun's test runner supports built-in code coverage reporting. To see coverage:
-
-```bash
-bun test --coverage
-```
-
-This will print a summary table showing the percentage of functions and lines covered for each file. Example output:
-
-```
--------------|---------|---------|-------------------
-File         | % Funcs | % Lines | Uncovered Line #s
--------------|---------|---------|-------------------
-All files    |  100.00 |  100.00 |
-src/utils/validation.ts | 100.00 | 100.00 |
-...
--------------|---------|---------|-------------------
-```
-
-You can also generate an lcov report for CI or HTML tools:
-
-```bash
-bun test --coverage --coverage-reporter=lcov
-```
-
----
+- Auth
+- Account
+- ATM
+- Bill Payments
+- Credit Card
+- Deposit / Top-ups
+- EON Card
+- Forex
+- Merchant
+- Fund Transfers
 
 ## Quick Start
 
 ```ts
-import { UBPClient } from "./src";
+import { UBPClient } from "ubp-ts";
 
 async function main() {
   const ubp = new UBPClient({

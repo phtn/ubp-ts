@@ -2,8 +2,8 @@
   "name": "ubp-ts",
   "version": "1.0.0",
   "description": "UnionBank PH TypeScript SDK - Pure functional, fully typed, and robustly tested.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "files": [
     "dist",
     "README.md",
@@ -24,7 +24,7 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "test": "bun test",
     "prepublishOnly": "bun test && bun run build",
     "lint:fix": "bun run lint.mjs"

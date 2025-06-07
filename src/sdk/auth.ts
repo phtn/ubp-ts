@@ -1,4 +1,4 @@
-import { requireParam } from "../utils/validation";
+import { requireParam } from "@/utils/validation";
 
 export interface AccessTokenResponse {
   token_type: "bearer";
@@ -13,7 +13,6 @@ export interface AccessTokenError {
 }
 
 export type Fetch = typeof fetch;
-
 // Partner Authentication (Password Grant)
 export interface PartnerAuthParams {
   clientId: string;

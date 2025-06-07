@@ -1,23 +1,15 @@
+import type {
+  AccountBalances,
+  AccountHistoryResponse,
+  AccountInformationResponse,
+  OnlineAccountInformation,
+  OnlineAccountInformationResponse,
+  SandboxRequest,
+  SandboxResponse,
+} from "@/types/accounts";
 import type { Fetch } from "../types/fetch";
-import type { components } from "../types/openapi.generated";
 import { throwUBPError } from "../utils/errorHelpers";
 import { requireParam } from "../utils/validation";
-
-// Types
-export type AccountInformationResponse =
-  components["schemas"]["AccountInformationResponse"];
-export type OnlineAccountInformation =
-  components["schemas"]["OnlineAccountInformation"];
-export type OnlineAccountInformationResponse =
-  components["schemas"]["OnlineAccountInformationResponse"];
-export type SandboxRequest = components["schemas"]["SandboxRequest"];
-export type SandboxResponse = components["schemas"]["SandboxResponse"];
-export type SandboxErrors = components["schemas"]["SandboxErrors"];
-export type AccountBalances = components["schemas"]["AccountBalances"];
-export type AccountBalancesErrors =
-  components["schemas"]["AccountBalancesErrors"];
-export type AccountHistoryResponse =
-  components["schemas"]["AccountHistoryResponse"];
 
 // 1. Get Account Details
 export async function getAccountInfo({
@@ -93,19 +85,19 @@ export async function getCustomerAccountInfo({
 export async function createSandboxAccount({
   clientId,
   clientSecret,
-  body,
   fetchImpl = fetch,
   baseUrl = "https://api-uat.unionbankph.com/partners/sb",
+  params,
 }: {
   clientId: string;
   clientSecret: string;
-  body: SandboxRequest;
   fetchImpl?: Fetch;
   baseUrl?: string;
+  params: SandboxRequest;
 }): Promise<SandboxResponse> {
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
-  requireParam(body, "body");
+  requireParam(params, "params");
   const res = await fetchImpl(`${baseUrl}/sandbox/v1/accounts`, {
     method: "POST",
     headers: {
@@ -114,7 +106,7 @@ export async function createSandboxAccount({
       "x-ibm-client-id": clientId,
       "x-ibm-client-secret": clientSecret,
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(params),
   });
   if (!res.ok) await throwUBPError(res);
   return (await res.json()) as SandboxResponse;
@@ -136,7 +128,7 @@ export async function getAccountBalance({
 }): Promise<AccountBalances> {
   requireParam(clientId, "clientId");
   requireParam(clientSecret, "clientSecret");
-  requireParam(accountNumber, "accountNumber");
+  // requireParam(accountNumber, "accountNumber");
   const res = await fetchImpl(
     `${baseUrl}/accounts/v2/balances/${accountNumber}`,
     {

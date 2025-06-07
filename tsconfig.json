@@ -14,6 +14,10 @@
     "noEmit": false,
     "declaration": true,
     "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
 
     // Best practices
     "strict": true,
@@ -26,5 +30,5 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
   },
-  "exclude": ["tests"]
+  "exclude": ["tests", "node_modules"]
 }

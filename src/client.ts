@@ -17,14 +17,17 @@ import {
   getAccountBalance,
   getPartnerAccountTransactionHistory,
   getCustomerAccountTransactionHistory,
-  type AccountInformationResponse,
-  type OnlineAccountInformation,
-  type OnlineAccountInformationResponse,
-  type SandboxRequest,
-  type SandboxResponse,
-  type AccountBalances,
-  type AccountHistoryResponse,
 } from "./sdk/accounts";
+import type {
+  AccountInformationResponse,
+  OnlineAccountInformation,
+  OnlineAccountInformationResponse,
+  SandboxRequest,
+  SandboxResponse,
+  AccountBalances,
+  AccountHistoryResponse,
+} from "./types/accounts";
+
 import {
   transferIntrabank,
   getIntrabankTransferStatus,
@@ -79,6 +82,8 @@ import {
   type CreditCardInquiryCards,
   type CreditCardPromos,
 } from "./sdk/creditCards";
+import type { AccessTokenResponse } from "./sdk/partner/types";
+import type { PartnerAuthParams } from "./types/auth";
 
 export interface UBPClientConfig {
   clientId: string;
@@ -135,6 +140,71 @@ export class UBPClient {
     if (this.onResponse)
       await this.onResponse({ url, options, endpoint, response: res });
     return res;
+  }
+
+  async authorize(body: PartnerAuthParams): Promise<object> {
+    const res = await this._fetchWithHooks(
+      `${this.baseUrl}/partners/v1/oauth2/authorize`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `client_id=${this.clientId}&response_type=code&scope=${body.scope}&redirect_uri=uri&state=state&type=single&partnerId=id`,
+      },
+      "/partners/v1/oauth2/authorize",
+    );
+    if (!res.ok) {
+      console.error("Failed to Get Authorization", res);
+      throw new Error(
+        `Failed to  Get Authorization: ${res.status} ${res.statusText}`,
+      );
+    }
+    return (await res.json()) as object;
+  }
+
+  async partnerAuth(body: PartnerAuthParams): Promise<AccessTokenResponse> {
+    const res = await this._fetchWithHooks(
+      `${this.baseUrl}/partners/v1/oauth2/token?grant_type=password&client_id=${this.clientId}&username=${body.username}&password=${body.password}&scope=${body.scope}`,
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/x-www-form-urlencoded",
+        },
+      },
+      "partnerAuth",
+    );
+    if (!res.ok) {
+      console.error("Failed to Authenticate Partner:", res);
+      throw new Error(
+        `Failed to Authenticate Partner: ${res.status} ${res.statusText}`,
+      );
+    }
+    return (await res.json()) as AccessTokenResponse;
+  }
+
+  // CUSTOMER AUTH
+  async customerAuth(): Promise<string> {
+    // &username=${process.env.USERNAME}&password=${process.env.PASSWORD}
+    const res = await this._fetchWithHooks(
+      `${this.baseUrl}/customers/v1/oauth2/authorize?client_id=${this.clientId}&response_type=code&partnerId=${process.env.PARTNER_ID}&scope=payments&redirect_uri=https://bigticket.ph/api/ubp/auth&type=linking`,
+      {
+        method: "GET",
+        headers: {
+          accept: "text/html",
+          "content-type": "application/x-www-form-urlencoded",
+        },
+      },
+      "customerAuth",
+    );
+    if (!res.ok) {
+      throw new Error(
+        `Failed to Authenticate Customer: ${res.status} ${res.statusText}`,
+      );
+    }
+    return await res.text();
   }
 
   async getATMs(): Promise<ATMsResponse> {
@@ -350,29 +420,21 @@ export class UBPClient {
     });
   }
 
-  async createSandboxAccount({
-    body,
-  }: {
-    body: SandboxRequest;
-  }): Promise<SandboxResponse> {
+  async createSandboxAccount(params: SandboxRequest): Promise<SandboxResponse> {
     return createSandboxAccount({
       clientId: this.clientId,
       clientSecret: this.clientSecret,
-      body,
+      params,
       fetchImpl: this.fetchImpl,
       baseUrl: this.baseUrl,
     });
   }
 
-  async getAccountBalance({
-    accountNumber,
-  }: {
-    accountNumber: string;
-  }): Promise<AccountBalances> {
+  async getAccountBalance(accountNumber: string): Promise<AccountBalances> {
     return getAccountBalance({
+      accountNumber,
       clientId: this.clientId,
       clientSecret: this.clientSecret,
-      accountNumber,
       fetchImpl: this.fetchImpl,
       baseUrl: this.baseUrl,
     });

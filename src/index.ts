@@ -69,13 +69,13 @@ async function getCustomerAccountInfo({
 async function createSandboxAccount({
   clientId,
   clientSecret,
-  body,
+  params,
   fetchImpl = fetch,
   baseUrl = "https://api-uat.unionbankph.com/partners/sb",
 }: {
   clientId: string;
   clientSecret: string;
-  body: components["schemas"]["SandboxRequest"];
+  params: components["schemas"]["SandboxRequest"];
   fetchImpl?: typeof fetch;
   baseUrl?: string;
 }): Promise<components["schemas"]["SandboxResponse"]> {
@@ -87,7 +87,7 @@ async function createSandboxAccount({
       "x-ibm-client-id": clientId,
       "x-ibm-client-secret": clientSecret,
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(params),
   });
   if (!res.ok)
     throw new Error(
@@ -949,24 +949,20 @@ class UBPClient {
       baseUrl: this.baseUrl,
     });
   }
-  async createSandboxAccount({
-    body,
-  }: {
-    body: components["schemas"]["SandboxRequest"];
-  }): Promise<components["schemas"]["SandboxResponse"]> {
+  async createSandboxAccount(
+    params: components["schemas"]["SandboxRequest"],
+  ): Promise<components["schemas"]["SandboxResponse"]> {
     return createSandboxAccount({
       clientId: this.clientId,
       clientSecret: this.clientSecret,
-      body,
+      params,
       fetchImpl: this.fetchImpl,
       baseUrl: this.baseUrl,
     });
   }
-  async getAccountBalance({
-    accountNumber,
-  }: {
-    accountNumber: string;
-  }): Promise<components["schemas"]["AccountBalances"]> {
+  async getAccountBalance(
+    accountNumber: string,
+  ): Promise<components["schemas"]["AccountBalances"]> {
     return getAccountBalance({
       clientId: this.clientId,
       clientSecret: this.clientSecret,

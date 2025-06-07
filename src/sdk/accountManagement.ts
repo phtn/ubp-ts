@@ -170,3 +170,4 @@ export async function upgradeEONWalletAccount({
   if (!res.ok) throw await throwUBPError(res);
   return (await res.json()) as EONWalletAccountUpgradeResponse;
 }
+ 
